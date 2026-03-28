@@ -49,7 +49,7 @@ flowchart LR
     E --> B
 ```
 
-    📁 Project Structure
+## 📁 Project Structure
 
     .
 ├── app/
@@ -72,74 +72,74 @@ flowchart LR
 └── .gitignore
 
 
-🖥️ Application
+## 🖥️ Application
 Backend (Flask API)
-/health → Service health check
-/predict → Object detection endpoint
-Loads YOLOv8 model (yolov8n.pt)
-Returns:
-Bounding boxes
-Labels
-Confidence scores
+- /health → Service health check
+- /predict → Object detection endpoint
+- Loads YOLOv8 model (yolov8n.pt)
+- Returns:
+- Bounding boxes
+- Labels
+- Confidence scores
 
 
 Frontend
-Image upload interface
-Sends requests to /predict
-Displays detection results
+- Image upload interface
+- Sends requests to /predict
+- Displays detection results
 
 🐳 Containerisation
-Multi-stage Docker builds
-Non-root user for security
-Lightweight base images
-Separate frontend/backend services
+- Multi-stage Docker builds
+- Non-root user for security
+- Lightweight base images
+- Separate frontend/backend services
 
 
-📦 Container Registry (ECR)
+## 📦 Container Registry (ECR)
 
-Images are stored in Amazon ECR.
+- Images are stored in Amazon ECR.
 
 docker tag yolov8-backend:latest <ecr-repo>:tag
 docker push <ecr-repo>:tag
 
-☁️ Deployment (AWS ECS - Fargate)
-Services Used
-ECS (Fargate)
-ECR
-Application Load Balancer
-Route53
-AWS Certificate Manager (ACM)
-IAM
-VPC
+## ☁️ Deployment (AWS ECS - Fargate)
+- Services Used
+- ECS (Fargate)
+- ECR
+- Application Load Balancer
+- Route53
+- AWS Certificate Manager (ACM)
+- IAM
+- VPC
 
 
-🏗️ Infrastructure as Code (Terraform)
+## 🏗️ Infrastructure as Code (Terraform)
 
 All AWS infrastructure is provisioned using Terraform.
 
 
-🔁 CI/CD Pipeline
+## 🔁 CI/CD Pipeline
 
 Implemented using GitHub Actions.
 
-Pipeline Stages
-Build Docker images
-Push images to ECR
-Deploy infrastructure (Terraform)
-Update ECS service
-Run health checks
+- Pipeline Stages
+- Build Docker images
+- Push images to ECR
+- Deploy infrastructure (Terraform)
+- Update ECS service
+- Run health checks
 
 
-📸 Screenshots (To Add)
-Application
-UI with object detection results
-API response output
-Docker
-Running containers locally
-AWS
-ECS service
-ALB configuration
-HTTPS working
-CI/CD
-GitHub Actions pipeline
+## 📸 Screenshots (To Add)
+- Application
+- UI with object detection results
+- API response output
+- Docker
+- Running containers locally
+- AWS
+- ECS service
+- ALB configuration
+- HTTPS working
+- CI/CD
+- GitHub Actions pipeline
 
