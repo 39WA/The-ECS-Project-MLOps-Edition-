@@ -72,7 +72,7 @@ flowchart LR
 ├── README.md
 └── .gitignore
 
-```s
+```
 
 
 ## 🖥️ Application
