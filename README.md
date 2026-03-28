@@ -102,8 +102,8 @@ Frontend
 
 - Images are stored in Amazon ECR.
 
-docker tag yolov8-backend:latest <ecr-repo>:tag
-docker push <ecr-repo>:tag
+- docker tag yolov8-backend:latest <ecr-repo>:tag
+- docker push <ecr-repo>:tag
 
 ## ☁️ Deployment (AWS ECS - Fargate)
 - Services Used
