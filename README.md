@@ -17,7 +17,7 @@ This project demonstrates a **real-world MLOps workflow**, taking a machine lear
 
 **Local Development → Containerisation → Cloud Deployment → Infrastructure as Code → CI/CD Automation**
 
-Unlike typical ML projects, this focuses on **deployment, scalability, and production readiness**.
+Unlike traditional ML projects, this focuses on **deployment, scalability, and production readiness**.
 
 ---
 
@@ -41,14 +41,12 @@ Unlike typical ML projects, this focuses on **deployment, scalability, and produ
 ```mermaid
 flowchart LR
     A[User Browser] --> B[Frontend UI]
-    B --> C[Application Load Balancer HTTPS]
-    C --> D[ECS Service Fargate]
+    B --> C[Application Load Balancer (HTTPS)]
+    C --> D[ECS Service (Fargate)]
     D --> E[Flask API]
     E --> F[YOLOv8 Model]
     F --> E
     E --> B
-
-    AWS Architecture
 
     📁 Project Structure
 
@@ -72,14 +70,17 @@ flowchart LR
 ├── README.md
 └── .gitignore
 
+
 🖥️ Application
-
 Backend (Flask API)
-
-/health → service health check
-/predict → object detection endpoint
+/health → Service health check
+/predict → Object detection endpoint
 Loads YOLOv8 model (yolov8n.pt)
-Returns bounding boxes, labels, confidence scores
+Returns:
+Bounding boxes
+Labels
+Confidence scores
+
 
 Frontend
 Image upload interface
@@ -88,13 +89,14 @@ Displays detection results
 
 🐳 Containerisation
 Multi-stage Docker builds
-Non-root user
-Lightweight images
+Non-root user for security
+Lightweight base images
 Separate frontend/backend services
+
 
 📦 Container Registry (ECR)
 
-Images are pushed to Amazon ECR.
+Images are stored in Amazon ECR.
 
 docker tag yolov8-backend:latest <ecr-repo>:tag
 docker push <ecr-repo>:tag
@@ -105,49 +107,38 @@ ECS (Fargate)
 ECR
 Application Load Balancer
 Route53
-ACM (SSL)
+AWS Certificate Manager (ACM)
 IAM
 VPC
 
-🌐 Live URL
-
-https://ml.<your-domain>
 
 🏗️ Infrastructure as Code (Terraform)
 
-All AWS resources are provisioned using Terraform.
+All AWS infrastructure is provisioned using Terraform.
 
-▶️ Run
 
 🔁 CI/CD Pipeline
 
-Implemented with GitHub Actions.
+Implemented using GitHub Actions.
 
 Pipeline Stages
 Build Docker images
-Push to ECR
-Terraform apply
-Deploy to ECS
-Health check validation
-
-🚀 Future Improvements
-Async inference (SQS + worker)
-Auto scaling (CPU/memory)
-Model versioning
-Canary deployments
-Redis caching
-Microservices architecture
+Push images to ECR
+Deploy infrastructure (Terraform)
+Update ECS service
+Run health checks
 
 
-📚 Key Learnings
-Production ML deployment
-AWS ECS architecture
-Infrastructure as Code (Terraform)
-CI/CD automation
-Secure cloud deployments
+📸 Screenshots (To Add)
+Application
+UI with object detection results
+API response output
+Docker
+Running containers locally
+AWS
+ECS service
+ALB configuration
+HTTPS working
+CI/CD
+GitHub Actions pipeline
 
-📌 Final Result
-Fully deployed ML application
-Accessible via HTTPS
-Automated deployments via CI/CD
-Production-grade cloud architecture
