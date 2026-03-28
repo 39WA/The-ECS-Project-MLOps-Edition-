@@ -11,7 +11,17 @@
 
 ---
 
-## 📌 Overview
+## 📌 Project Overview
+
+This project is an end-to-end MLOps application that deploys a YOLOv8 object detection model as a production-ready web service on AWS.
+
+Users can upload an image through a frontend interface, which sends the request to a Flask-based API. The API performs inference using a pre-trained YOLOv8 model and returns detected objects with bounding boxes and confidence scores.
+
+The application is fully containerised using Docker and deployed on AWS ECS (Fargate) behind an Application Load Balancer with HTTPS enabled via AWS Certificate Manager and Route53.
+
+All infrastructure is provisioned using Terraform, and deployments are automated through a CI/CD pipeline using GitHub Actions.
+
+This project demonstrates real-world MLOps practices, including model serving, container orchestration, infrastructure as code, and automated deployments.
 
 This project demonstrates a **real-world MLOps workflow**, taking a machine learning model from:
 
