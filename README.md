@@ -47,6 +47,7 @@ flowchart LR
     E --> F[YOLOv8 Model]
     F --> E
     E --> B
+```
 
     📁 Project Structure
 
