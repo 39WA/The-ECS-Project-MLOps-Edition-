@@ -51,7 +51,8 @@ flowchart LR
 
 ## 📁 Project Structure
 
-    .
+```
+.
 ├── app/
 │   ├── frontend/
 │   ├── backend/
@@ -71,11 +72,13 @@ flowchart LR
 ├── README.md
 └── .gitignore
 
+```s
+
 
 ## 🖥️ Application
 Backend (Flask API)
-- /health → Service health check
-- /predict → Object detection endpoint
+- Health → Service health check
+- Predict → Object detection endpoint
 - Loads YOLOv8 model (yolov8n.pt)
 - Returns:
 - Bounding boxes
