@@ -40,11 +40,11 @@ Unlike traditional ML projects, this focuses on **deployment, scalability, and p
 
 ```mermaid
 flowchart LR
-    A[User Browser] --> B[Frontend UI]
-    B --> C[Application Load Balancer (HTTPS)]
-    C --> D[ECS Service (Fargate)]
-    D --> E[Flask API]
-    E --> F[YOLOv8 Model]
+    A["User Browser"] --> B["Frontend UI"]
+    B --> C["Application Load Balancer (HTTPS)"]
+    C --> D["ECS Service (Fargate)"]
+    D --> E["Flask API"]
+    E --> F["YOLOv8 Model"]
     F --> E
     E --> B
 
