@@ -106,10 +106,9 @@ curl http://localhost:5001/health
 ```
 {"status":"ok"}
 
-![Health Check](images/API_health_check_working .png)
-
-
-
+<p align="center">
+  <img src="docs/health-check.png" width="800"/>
+</p>
 
 
 Frontend
