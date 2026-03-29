@@ -118,6 +118,7 @@ The `/predict` endpoint performs real-time object detection using the YOLOv8 mod
 
 ```bash
 curl -X POST -F "image=@test.jpg" http://localhost:5001/predict
+```
 
 [
   {
