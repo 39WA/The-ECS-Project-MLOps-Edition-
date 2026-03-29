@@ -106,9 +106,31 @@ curl http://localhost:5001/health
 ```
 {"status":"ok"}
 
-<p align="centlefter">
+<p align="left">
   <img src="docs/health-check.png" width="800"/>
 </p>
+
+### Application — Object Detection
+
+The `/predict` endpoint performs real-time object detection using the YOLOv8 model.
+
+![Prediction Output](./screenshots/predict-output.png)
+
+```bash
+curl -X POST -F "image=@test.jpg" http://localhost:5001/predict
+
+[
+  {
+    "bbox": [130.57, 129.97, 3687.63, 1657.32],
+    "confidence": 0.88,
+    "label": 2
+  }
+]
+
+<p align="left">
+  <img src="docs/predict-output.png" width="800"/>
+</p>
+
 
 
 Frontend
