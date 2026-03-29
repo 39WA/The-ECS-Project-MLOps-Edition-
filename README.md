@@ -106,7 +106,7 @@ curl http://localhost:5001/health
 ```
 {"status":"ok"}
 
-![Health Check](./images/health-check.png)
+![Health Check](images/health-check.png)
 
 
 
