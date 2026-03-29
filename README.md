@@ -95,6 +95,22 @@ Backend (Flask API)
 - Labels
 - Confidence scores
 
+### Application
+
+#### Health Check Endpoint
+
+<p align="center">
+  <img src="images/health-check.png width="800"/>
+</p>
+
+
+The `/health` endpoint verifies that the Flask API is running correctly.
+
+```bash
+curl http://localhost:5001/health
+```
+{"status":"ok"}
+
 
 Frontend
 - Image upload interface
