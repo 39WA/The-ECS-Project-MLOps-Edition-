@@ -106,9 +106,7 @@ curl http://localhost:5001/health
 ```
 {"status":"ok"}
 
-<p align="center">
-  <img src="images/API_health_check_working .png width="800"/>
-</p>
+![Health Check](./screenshots/health-check.png)
 
 
 
