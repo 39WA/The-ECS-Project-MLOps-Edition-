@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>YOLOv8 Object Detection</title>
+</head>
+<body>
+
+    <h2>YOLOv8 Object Detection</h2>
+
+    <input type="file" id="imageInput" />
+    <button onclick="uploadImage()">Predict</button>
+
+    <pre id="output"></pre>
+
+    <script>
+        async function uploadImage() {
+            const fileInput = document.getElementById("imageInput");
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert("Please select an image");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("image", file);
+
+            const response = await fetch("http://localhost:5001/predict", {
+                method: "POST",
+                body: formData
+            });
+
+            const data = await response.json();
+
+            document.getElementById("output").textContent =
+                JSON.stringify(data, null, 2);
+        }
+    </script>
+
+</body>
+</html>
