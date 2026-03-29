@@ -142,9 +142,7 @@ Frontend
 
 The frontend allows users to upload an image and perform real-time object detection using the YOLOv8 model.
 
-<p align="left">
-  <img src="docs/frontend-ui.png width="800"/>
-</p>
+<img src="docs/predict-output.png" width="800"/>
 
 🐳 Containerisation
 - Multi-stage Docker builds
