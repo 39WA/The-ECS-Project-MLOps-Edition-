@@ -1,10 +1,12 @@
 from flask import Flask, request, jsonify
 from ultralytics import YOLO
 from PIL import Image
+from flask_cors import CORS
 
 print("🚀 Starting Flask app...")
 
 app = Flask(__name__)
+CORS(app) 
 
 model = YOLO("yolov8n.pt")
 

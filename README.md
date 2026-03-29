@@ -138,6 +138,14 @@ Frontend
 - Sends requests to /predict
 - Displays detection results
 
+### Application — Frontend UI
+
+The frontend allows users to upload an image and perform real-time object detection using the YOLOv8 model.
+
+<p align="left">
+  <img src="docs/frontend-ui.png width="800"/>
+</p>
+
 🐳 Containerisation
 - Multi-stage Docker builds
 - Non-root user for security
