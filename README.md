@@ -114,7 +114,6 @@ curl http://localhost:5001/health
 
 The `/predict` endpoint performs real-time object detection using the YOLOv8 model.
 
-![Prediction Output](./screenshots/predict-output.png)
 
 ```bash
 curl -X POST -F "image=@test.jpg" http://localhost:5001/predict
