@@ -164,6 +164,19 @@ The container is verified using:
 - `/health` endpoint to confirm API availability  
 
 
+## 🌐 Full System — End-to-End Application
+
+The complete application is running locally with:
+
+- Frontend served via a lightweight HTTP server  
+- Backend running inside a Docker container  
+- YOLOv8 model performing real-time object detection  
+- API communication over HTTP  
+
+Users can upload an image and receive detection results including bounding boxes, labels, and confidence scores.
+
+<img src="docs/full-system-working.png" width="800"/>
+
 
 ## 📦 Container Registry (ECR)
 
