@@ -185,6 +185,11 @@ Users can upload an image and receive detection results including bounding boxes
 - docker tag yolov8-backend:latest <ecr-repo>:tag
 - docker push <ecr-repo>:tag
 
+The Docker image is pushed to Amazon Elastic Container Registry (ECR) for deployment.
+
+<img src="docs/docker-push-ecr.png" width="800"/>
+
+
 ## ☁️ Deployment (AWS ECS - Fargate)
 - Services Used
 - ECS (Fargate)
