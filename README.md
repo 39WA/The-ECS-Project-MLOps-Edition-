@@ -175,6 +175,8 @@ The complete application is running locally with:
 
 Users can upload an image and receive detection results including bounding boxes, labels, and confidence scores.
 
+Optimised ML container images and learned about dependency size management.
+
 <img src="docs/full-system-working.png" width="800"/>
 
 
