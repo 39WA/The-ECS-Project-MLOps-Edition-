@@ -150,6 +150,18 @@ The frontend allows users to upload an image and perform real-time object detect
 - Lightweight base images
 - Separate frontend/backend services
 
+he backend API is fully containerised using Docker and runs inside an isolated environment with all dependencies installed.
+
+The container exposes port `5000`, which is mapped to port `5002` on the host machine.
+
+### 🔍 Verification
+
+The container is verified using:
+
+- `docker ps` to confirm it is running  
+- `/health` endpoint to confirm API availability  
+
+<img src="docs/docker-backend-running.png" width="800"/>
 
 ## 📦 Container Registry (ECR)
 
