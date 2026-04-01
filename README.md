@@ -192,6 +192,13 @@ Optimised ML container images and learned about dependency size management.
 <img src="docs/docker-push-ecr.png" width="800"/>
 
 
+### 💰 Cost Considerations
+
+- ECR storage: ~$0.50/month  
+- ECS + ALB: ~$1.50/day when running  
+- Resources are destroyed after testing to minimize cost
+
+
 ## ☁️ Deployment (AWS ECS - Fargate)
 - Services Used
 - ECS (Fargate)
