@@ -212,7 +212,9 @@ Optimised ML container images and learned about dependency size management.
 
 # ☁️ AWS ECS Fargate Deployment
 
-The containerised YOLOv8 Flask backend was successfully deployed to AWS ECS using Fargate behind an Application Load Balancer.
+The containerised YOLOv8 Flask backend was successfully deployed to AWS ECS using Fargate behind an Application Load Balancer (ALB).
+
+This section documents the full deployment workflow, debugging process, infrastructure setup, and final production deployment.
 
 ---
 
@@ -234,49 +236,87 @@ The containerised YOLOv8 Flask backend was successfully deployed to AWS ECS usin
 
 - Docker container deployment to ECS
 - Container image hosting in Amazon ECR
-- Application Load Balancer routing
-- ECS task orchestration
-- Health check monitoring
-- Security group configuration
-- CloudWatch logging and debugging
-- ECS task definition revisions
-- Production deployment troubleshooting
-- ARM64 vs x86_64 container debugging
-- Public API endpoint exposure
+- ECS cluster provisioning
+- ECS service configuration
+- Application Load Balancer integration
+- Public endpoint exposure
+- Health check configuration
+- CloudWatch logging
+- ECS deployment troubleshooting
+- ARM64 vs x86_64 architecture debugging
+- ECS task recovery workflows
 
 ---
 
-# Deployment Workflow
+# 🚀 Deployment Workflow
 
-## 1️⃣ Amazon ECR Repository Created
+---
 
-The Docker image repository was created in Amazon ECR to store backend container images for deployment.
+# 1️⃣ Create Amazon ECR Repository
+
+An Amazon Elastic Container Registry (ECR) repository was created to host the backend Docker images.
 
 <img src="docs/ecr-repository.png" width="1000"/>
 
 ---
 
-## 2️⃣ Docker Image Push to ECR
+# 2️⃣ Build and Tag Docker Image
 
-The backend Docker image was tagged and pushed to Amazon ECR.
+The YOLOv8 backend Docker image was built locally and tagged for ECR deployment.
 
-### Docker Push In Progress
+```bash
+docker build -t yolov8-backend .
+docker tag yolov8-backend:latest \
+739340816202.dkr.ecr.eu-west-2.amazonaws.com/yolov8-backend:latest
+```
+
+---
+
+# 3️⃣ Authenticate Docker with Amazon ECR
+
+Docker authentication was configured using AWS CLI credentials.
+
+```bash
+aws ecr get-login-password --region eu-west-2 \
+| docker login --username AWS --password-stdin \
+739340816202.dkr.ecr.eu-west-2.amazonaws.com
+```
+
+---
+
+# 4️⃣ Push Docker Image to ECR
+
+The Docker image was successfully pushed to the ECR repository.
+
+## Docker Push In Progress
 
 <img src="docs/ecr-push-in-progress.png" width="1000"/>
 
-### Docker Push Completed Successfully
+---
+
+## Docker Push Progress
+
+<img src="docs/ecr-push-complete.png" width="1000"/>
+
+---
+
+## Docker Push Completed Successfully
 
 <img src="docs/ecr-push-success.png" width="1000"/>
 
-### ECR Image Successfully Uploaded
+---
+
+# 5️⃣ Verify Uploaded Docker Image in ECR
+
+The uploaded container image was verified inside Amazon ECR.
 
 <img src="docs/ecr-image.png" width="1000"/>
 
 ---
 
-## 3️⃣ ECS Cluster Creation
+# 6️⃣ Create ECS Cluster
 
-The ECS cluster was created successfully and configured for AWS Fargate deployment.
+An ECS cluster was created successfully for AWS Fargate deployment.
 
 <img src="docs/ecs-cluster-created.png" width="1000"/>
 
@@ -284,32 +324,114 @@ The ECS cluster was created successfully and configured for AWS Fargate deployme
 
 # ⚠️ ECS Deployment Troubleshooting
 
-During deployment, several production deployment issues were encountered and resolved.
+Several deployment issues occurred during production rollout and were debugged using ECS task monitoring and CloudWatch logs.
 
 ---
 
-## 4️⃣ ECS Service Rollback Issue
+# 7️⃣ Initial ECS Service Deployment Failure
 
-Initial ECS deployments failed due to unhealthy task states and failed health checks.
+The ECS service deployment initially failed and rolled back automatically.
+
+<img src="docs/ecs-deployment-failed.png" width="1000"/>
+
+---
+
+# 8️⃣ ECS Rollback Triggered
+
+The ECS deployment circuit breaker triggered a rollback because tasks failed health checks.
 
 <img src="docs/ecs-rollback.png" width="1000"/>
 
 ---
 
-## 5️⃣ ECS Tasks Remaining Pending
+# 9️⃣ ECS Tasks Stuck in Pending State
 
-ECS tasks initially remained stuck in a pending state during deployment debugging.
+During troubleshooting, ECS tasks remained in a pending state while debugging container startup issues.
 
 <img src="docs/ecs-task-pending.png" width="1000"/>
 
 ---
 
-## 6️⃣ CloudWatch Runtime Error Logs
+# 🔟 CloudWatch Runtime Error Investigation
 
-CloudWatch logs identified an architecture mismatch issue:
+CloudWatch logs revealed the following runtime error:
 
 ```text
 exec /usr/local/bin/python: exec format error
+```
+
+This occurred because the Docker image was built for ARM64 architecture instead of x86_64, which ECS Fargate expected.
+
+<img src="docs/ecs-exec-format-error.png" width="1000"/>
+
+---
+
+# 🛠️ Resolving the Architecture Issue
+
+The Docker image was rebuilt for the correct Linux AMD64 platform.
+
+```bash
+docker buildx build \
+--platform linux/amd64 \
+-t yolov8-backend:latest .
+```
+
+The rebuilt image was then re-tagged and pushed to Amazon ECR.
+
+---
+
+# ✅ Successful ECS Deployment
+
+After rebuilding and redeploying the container image, the ECS tasks started successfully and the API became publicly accessible.
+
+---
+
+# 1️⃣1️⃣ Direct ECS Task Health Check
+
+The Flask API successfully responded from the ECS task public IP address.
+
+<img src="docs/ecs-direct-health-check.png" width="1000"/>
+
+---
+
+# 1️⃣2️⃣ ALB Health Check Endpoint Success
+
+The Application Load Balancer successfully routed traffic to the ECS service health endpoint.
+
+<img src="docs/ecs-yolov8-health-endpoint-success.png" width="1000"/>
+
+---
+
+# 1️⃣3️⃣ Final Production Endpoint Working
+
+The final production endpoint successfully returned a valid response through the Application Load Balancer.
+
+<img src="docs/ecs-yolov8-root-endpoint-success.png" width="1000"/>
+
+---
+
+# ✅ Deployment Successfully Verified
+
+The following production deployment functionality was successfully verified:
+
+- ECS Fargate deployment
+- Docker container orchestration
+- ECR image hosting
+- ECS task scheduling
+- ALB traffic routing
+- Health check monitoring
+- Public endpoint accessibility
+- CloudWatch debugging workflows
+- ECS rollback troubleshooting
+- Architecture compatibility debugging
+- Production Flask API deployment
+
+---
+
+# 📌 Final Result
+
+The YOLOv8 Flask backend is now successfully containerised and deployed on AWS ECS Fargate behind an Application Load Balancer with working public endpoints and health monitoring.
+
 
 ## 🏗️ Infrastructure as Code (Terraform)
 
