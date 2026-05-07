@@ -210,6 +210,107 @@ Optimised ML container images and learned about dependency size management.
 - VPC
 
 
+# ☁️ AWS ECS Fargate Deployment
+
+The containerised YOLOv8 Flask backend was successfully deployed to AWS ECS using Fargate behind an Application Load Balancer.
+
+---
+
+# AWS Services Used
+
+- Amazon ECS (Fargate)
+- Amazon Elastic Container Registry (ECR)
+- Application Load Balancer (ALB)
+- IAM Roles
+- VPC Networking
+- Security Groups
+- CloudWatch Logs
+- ECS Task Definitions
+- ECS Services
+
+---
+
+# Deployment Features Implemented
+
+- Docker container deployment to ECS
+- Container image hosting in Amazon ECR
+- Application Load Balancer routing
+- ECS task orchestration
+- Health check monitoring
+- Security group configuration
+- CloudWatch logging and debugging
+- ECS task definition revisions
+- Production deployment troubleshooting
+- ARM64 vs x86_64 container debugging
+- Public API endpoint exposure
+
+---
+
+# Deployment Workflow
+
+## 1️⃣ Amazon ECR Repository Created
+
+The Docker image repository was created in Amazon ECR to store backend container images for deployment.
+
+<img src="docs/ecr-repository.png" width="1000"/>
+
+---
+
+## 2️⃣ Docker Image Push to ECR
+
+The backend Docker image was tagged and pushed to Amazon ECR.
+
+### Docker Push In Progress
+
+<img src="docs/ecr-push-in-progress.png" width="1000"/>
+
+### Docker Push Completed Successfully
+
+<img src="docs/ecr-push-success.png" width="1000"/>
+
+### ECR Image Successfully Uploaded
+
+<img src="docs/ecr-image.png" width="1000"/>
+
+---
+
+## 3️⃣ ECS Cluster Creation
+
+The ECS cluster was created successfully and configured for AWS Fargate deployment.
+
+<img src="docs/ecs-cluster-created.png" width="1000"/>
+
+---
+
+# ⚠️ ECS Deployment Troubleshooting
+
+During deployment, several production deployment issues were encountered and resolved.
+
+---
+
+## 4️⃣ ECS Service Rollback Issue
+
+Initial ECS deployments failed due to unhealthy task states and failed health checks.
+
+<img src="docs/ecs-rollback.png" width="1000"/>
+
+---
+
+## 5️⃣ ECS Tasks Remaining Pending
+
+ECS tasks initially remained stuck in a pending state during deployment debugging.
+
+<img src="docs/ecs-task-pending.png" width="1000"/>
+
+---
+
+## 6️⃣ CloudWatch Runtime Error Logs
+
+CloudWatch logs identified an architecture mismatch issue:
+
+```text
+exec /usr/local/bin/python: exec format error
+
 ## 🏗️ Infrastructure as Code (Terraform)
 
 All AWS infrastructure is provisioned using Terraform.

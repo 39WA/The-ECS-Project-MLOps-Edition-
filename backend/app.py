@@ -6,13 +6,25 @@ from flask_cors import CORS
 print("🚀 Starting Flask app...")
 
 app = Flask(__name__)
-CORS(app) 
+CORS(app)
 
-model = YOLO("yolov8n.pt")
+model = None
+
+@app.before_request
+def load_model():
+    global model
+    if model is None:
+        print("📦 Loading YOLO model...")
+        model = YOLO("yolov8n.pt")
+        print("✅ Model loaded")
 
 @app.route("/health")
 def health():
-    return {"status": "ok"}
+    return {"status": "ok"}, 200
+
+@app.route("/")
+def home():
+    return "OK"
 
 @app.route("/predict", methods=["POST"])
 def predict():
@@ -36,4 +48,4 @@ def predict():
     return jsonify(detections)
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000)
