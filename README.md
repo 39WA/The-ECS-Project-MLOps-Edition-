@@ -489,33 +489,6 @@ terraform/
 
 ---
 
-# Step 1 — Install Terraform
-
-## macOS
-
-```bash
-brew tap hashicorp/tap
-brew install hashicorp/tap/terraform
-```
-
-Verify:
-
-```bash
-terraform -version
-```
-
----
-
-# Step 2 — Create Terraform Folder
-
-Inside project root:
-
-```bash
-mkdir terraform
-cd terraform
-```
-
----
 
 # provider.tf
 
@@ -829,7 +802,9 @@ Terraform has been successfully initialized!
 Screenshot:
 
 ```text
-terraform-init-success.png
+
+<img src="docs/terraform-init-success.pngg"/>
+
 ```
 
 ---
