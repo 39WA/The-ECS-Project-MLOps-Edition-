@@ -435,7 +435,577 @@ The YOLOv8 Flask backend is now successfully containerised and deployed on AWS E
 
 ## 🏗️ Infrastructure as Code (Terraform)
 
-All AWS infrastructure is provisioned using Terraform.
+# Infrastructure as Code (Terraform)
+
+## Objective
+
+Provision the AWS infrastructure for the YOLOv8 MLOps deployment using Terraform.
+
+This section automates:
+
+- VPC networking
+- Public subnets
+- Security groups
+- ECS Cluster
+- ECS Task Definition
+- ECS Fargate Service
+- Application Load Balancer (ALB)
+- Target Group
+- CloudWatch logging
+- IAM roles
+
+---
+
+# Architecture
+
+```text
+Internet
+   ↓
+Application Load Balancer (ALB)
+   ↓
+ECS Fargate Service
+   ↓
+YOLOv8 Flask Container
+   ↓
+Amazon ECR Image
+```
+
+---
+
+# Project Structure
+
+```text
+terraform/
+├── main.tf
+├── variables.tf
+├── outputs.tf
+├── provider.tf
+├── ecs.tf
+├── alb.tf
+├── iam.tf
+├── networking.tf
+├── terraform.tfvars
+```
+
+---
+
+# Step 1 — Install Terraform
+
+## macOS
+
+```bash
+brew tap hashicorp/tap
+brew install hashicorp/tap/terraform
+```
+
+Verify:
+
+```bash
+terraform -version
+```
+
+---
+
+# Step 2 — Create Terraform Folder
+
+Inside project root:
+
+```bash
+mkdir terraform
+cd terraform
+```
+
+---
+
+# provider.tf
+
+```hcl
+terraform {
+  required_version = ">= 1.5.0"
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}
+
+provider "aws" {
+  region = var.aws_region
+}
+```
+
+---
+
+# variables.tf
+
+```hcl
+variable "aws_region" {
+  default = "eu-west-2"
+}
+
+variable "project_name" {
+  default = "yolov8"
+}
+
+variable "container_image" {
+  default = "739340816202.dkr.ecr.eu-west-2.amazonaws.com/yolov8-backend:latest"
+}
+```
+
+---
+
+# networking.tf
+
+```hcl
+resource "aws_vpc" "main" {
+  cidr_block           = "10.0.0.0/16"
+  enable_dns_support   = true
+  enable_dns_hostnames = true
+
+  tags = {
+    Name = "yolov8-vpc"
+  }
+}
+
+resource "aws_internet_gateway" "gw" {
+  vpc_id = aws_vpc.main.id
+
+  tags = {
+    Name = "yolov8-igw"
+  }
+}
+
+resource "aws_subnet" "public_a" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.1.0/24"
+  availability_zone       = "eu-west-2a"
+  map_public_ip_on_launch = true
+
+  tags = {
+    Name = "yolov8-public-a"
+  }
+}
+
+resource "aws_subnet" "public_b" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.2.0/24"
+  availability_zone       = "eu-west-2b"
+  map_public_ip_on_launch = true
+
+  tags = {
+    Name = "yolov8-public-b"
+  }
+}
+
+resource "aws_route_table" "public" {
+  vpc_id = aws_vpc.main.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.gw.id
+  }
+}
+
+resource "aws_route_table_association" "a" {
+  subnet_id      = aws_subnet.public_a.id
+  route_table_id = aws_route_table.public.id
+}
+
+resource "aws_route_table_association" "b" {
+  subnet_id      = aws_subnet.public_b.id
+  route_table_id = aws_route_table.public.id
+}
+
+resource "aws_security_group" "ecs_sg" {
+  name        = "yolov8-sg"
+  description = "Allow HTTP traffic"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 5000
+    to_port     = 5000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+```
+
+---
+
+# iam.tf
+
+```hcl
+resource "aws_iam_role" "ecs_task_execution_role" {
+  name = "ecsTaskExecutionRole-yolov8"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "ecs-tasks.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ecs_task_execution_policy" {
+  role       = aws_iam_role.ecs_task_execution_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+}
+```
+
+---
+
+# alb.tf
+
+```hcl
+resource "aws_lb" "main" {
+  name               = "yolov8-alb"
+  internal           = false
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.ecs_sg.id]
+
+  subnets = [
+    aws_subnet.public_a.id,
+    aws_subnet.public_b.id
+  ]
+}
+
+resource "aws_lb_target_group" "app" {
+  name        = "yolov8-target-group"
+  port        = 5000
+  protocol    = "HTTP"
+  target_type = "ip"
+  vpc_id      = aws_vpc.main.id
+
+  health_check {
+    path                = "/health"
+    protocol            = "HTTP"
+    matcher             = "200"
+    interval            = 30
+    timeout             = 5
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+  }
+}
+
+resource "aws_lb_listener" "http" {
+  load_balancer_arn = aws_lb.main.arn
+  port              = 80
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.app.arn
+  }
+}
+```
+
+---
+
+# ecs.tf
+
+```hcl
+resource "aws_ecs_cluster" "main" {
+  name = "yolov8-cluster"
+}
+
+resource "aws_cloudwatch_log_group" "ecs_logs" {
+  name = "/ecs/yolov8"
+}
+
+resource "aws_ecs_task_definition" "app" {
+  family                   = "yolov8-task"
+  network_mode             = "awsvpc"
+  requires_compatibilities = ["FARGATE"]
+  cpu                      = "1024"
+  memory                   = "3072"
+  execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
+
+  container_definitions = jsonencode([
+    {
+      name      = "yolov8-backend"
+      image     = var.container_image
+      essential = true
+
+      portMappings = [
+        {
+          containerPort = 5000
+          hostPort      = 5000
+        }
+      ]
+
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-group         = aws_cloudwatch_log_group.ecs_logs.name
+          awslogs-region        = var.aws_region
+          awslogs-stream-prefix = "ecs"
+        }
+      }
+    }
+  ])
+}
+
+resource "aws_ecs_service" "app" {
+  name            = "yolov8-service"
+  cluster         = aws_ecs_cluster.main.id
+  task_definition = aws_ecs_task_definition.app.arn
+  desired_count   = 1
+  launch_type     = "FARGATE"
+
+  network_configuration {
+    subnets = [
+      aws_subnet.public_a.id,
+      aws_subnet.public_b.id
+    ]
+
+    security_groups  = [aws_security_group.ecs_sg.id]
+    assign_public_ip = true
+  }
+
+  load_balancer {
+    target_group_arn = aws_lb_target_group.app.arn
+    container_name   = "yolov8-backend"
+    container_port   = 5000
+  }
+
+  depends_on = [aws_lb_listener.http]
+}
+```
+
+---
+
+# outputs.tf
+
+```hcl
+output "alb_dns_name" {
+  value = aws_lb.main.dns_name
+}
+```
+
+---
+
+# terraform.tfvars
+
+```hcl
+aws_region = "eu-west-2"
+```
+
+---
+
+# Step 3 — Initialise Terraform
+
+```bash
+terraform init
+```
+
+Expected:
+
+```text
+Terraform has been successfully initialized!
+```
+
+Screenshot:
+
+```text
+terraform-init-success.png
+```
+
+---
+
+# Step 4 — Validate Configuration
+
+```bash
+terraform validate
+```
+
+Expected:
+
+```text
+Success! The configuration is valid.
+```
+
+Screenshot:
+
+```text
+terraform-validate-success.png
+```
+
+---
+
+# Step 5 — Review Infrastructure Plan
+
+```bash
+terraform plan
+```
+
+Screenshot:
+
+```text
+terraform-plan.png
+```
+
+---
+
+# Step 6 — Deploy Infrastructure
+
+```bash
+terraform apply
+```
+
+Type:
+
+```text
+yes
+```
+
+Screenshot:
+
+```text
+terraform-apply-success.png
+```
+
+---
+
+# Step 7 — Retrieve ALB URL
+
+```bash
+terraform output
+```
+
+Expected:
+
+```text
+alb_dns_name = "yolov8-alb-xxxxxxxx.eu-west-2.elb.amazonaws.com"
+```
+
+Screenshot:
+
+```text
+terraform-output-alb.png
+```
+
+---
+
+# Step 8 — Test Health Endpoint
+
+Open:
+
+```text
+http://ALB-DNS/health
+```
+
+Expected:
+
+```json
+{"status":"ok"}
+```
+
+Screenshot:
+
+```text
+terraform-health-success.png
+```
+
+---
+
+# Step 9 — Test Predict Endpoint
+
+```bash
+curl -X POST -F "image=@test.jpg" http://ALB-DNS/predict
+```
+
+Expected:
+
+```json
+[
+  {
+    "bbox": [...],
+    "confidence": 0.89,
+    "label": 2
+  }
+]
+```
+
+Screenshot:
+
+```text
+terraform-predict-success.png
+```
+
+---
+
+# Terraform Resources Used
+
+| Resource | Purpose |
+|---|---|
+| aws_vpc | Networking |
+| aws_subnet | Public subnets |
+| aws_security_group | Firewall rules |
+| aws_lb | Application Load Balancer |
+| aws_lb_target_group | ECS routing |
+| aws_ecs_cluster | Container orchestration |
+| aws_ecs_task_definition | Container specification |
+| aws_ecs_service | Running service |
+| aws_cloudwatch_log_group | Logging |
+| aws_iam_role | ECS permissions |
+
+---
+
+# Skills Demonstrated
+
+- Infrastructure as Code (IaC)
+- Terraform automation
+- AWS ECS/Fargate deployment
+- ALB configuration
+- Container orchestration
+- Cloud networking
+- IAM configuration
+- Cloud-native MLOps deployment
+- Production-ready infrastructure provisioning
+
+---
+
+# Cleanup
+
+Destroy all infrastructure to avoid AWS charges:
+
+```bash
+terraform destroy
+```
+
+Type:
+
+```text
+yes
+```
+
+---
+
+# Portfolio Outcome
+
+This section demonstrates production-grade Infrastructure as Code deployment for a machine learning inference service using Terraform and AWS ECS/Fargate.
 
 
 ## 🔁 CI/CD Pipeline
