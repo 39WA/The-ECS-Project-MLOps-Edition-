@@ -802,8 +802,9 @@ Terraform has been successfully initialized!
 Screenshot:
 
 ```text
-
-<img src="docs/terraform-init-success.pngg"/>
+<p align="left">
+<img src="docs/terraform-init-success.png"/>
+<p>
 
 ```
 
