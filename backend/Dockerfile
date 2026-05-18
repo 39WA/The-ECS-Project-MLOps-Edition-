@@ -18,7 +18,7 @@ COPY requirements.txt .
 # Install Python dependencies
 
 RUN pip install --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+    pip install --default-timeout=100 --retries 10 --no-cache-dir -r requirements.txt
 
 
     # Copy app
