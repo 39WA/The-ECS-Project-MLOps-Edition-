@@ -641,26 +641,91 @@ This section demonstrates production-grade Infrastructure as Code deployment for
 
 ## 🔁 CI/CD Pipeline
 
-Implemented using GitHub Actions.
+Implemented using GitHub Actions to automate the deployment workflow for the YOLOv8 ECS application.
 
-- Pipeline Stages
-- Build Docker images
-- Push images to ECR
-- Deploy infrastructure (Terraform)
+### Pipeline Stages
+- Build Docker image
+- Push image to Amazon ECR
+- Deploy infrastructure updates with Terraform
 - Update ECS service
-- Run health checks
+- Run application health checks
 
+---
 
-## 📸 Screenshots (To Add)
-- Application
-- UI with object detection results
-- API response output
-- Docker
-- Running containers locally
-- AWS
-- ECS service
-- ALB configuration
-- HTTPS working
-- CI/CD
-- GitHub Actions pipeline
+## 📸 CI/CD Evidence
+
+### GitHub Repository Created
+Repository initialized and connected to local project.
+
+![GitHub Repository Created](docs/github-repository-created.png)
+
+---
+
+### Initial Git Commit
+Initial project files committed successfully.
+
+![Initial Git Commit](docs/git-initial-commit-success.png)
+
+---
+
+### GitHub Project Uploaded Successfully
+Project structure uploaded to GitHub repository.
+
+![GitHub Project Uploaded](docs/github-project-uploaded-success.png)
+
+---
+
+### GitHub Actions Workflow Folder Created
+Created `.github/workflows` directory for CI/CD automation.
+
+![Workflow Folder Created](docs/github-actions-workflow-folder-created.png)
+
+---
+
+### GitHub Actions Deployment Workflow
+GitHub Actions deployment pipeline configuration (`deploy.yml`).
+
+![GitHub Actions Workflow](docs/github-actions-workflow-file.png)
+
+---
+
+### IAM User for GitHub Actions
+AWS IAM user configured with ECS and ECR permissions for CI/CD deployments.
+
+![IAM User](docs/github-actions-iam-user.png)
+
+---
+
+### GitHub Actions Workflow Push
+CI/CD workflow committed and pushed to GitHub.
+
+![Workflow Push Success](docs/github-actions-workflow-push-success.png)
+
+---
+
+### GitHub Actions Pipeline Running
+Automated deployment pipeline executing successfully.
+
+![Pipeline Running](docs/github-actions-pipeline-running.png)
+
+---
+
+### GitHub Actions Pipeline Success
+Successful CI/CD deployment to AWS ECS.
+
+![Pipeline Success](docs/github-actions-pipeline-success.png)
+
+---
+
+### Git Force Push After Cleanup
+Terraform cache and unnecessary files removed before final push.
+
+![Force Push Success](docs/github-force-push-success.png)
+
+---
+
+### Final Clean Push to Repository
+Repository cleaned and updated successfully.
+
+![Final Clean Push](docs/github-final-clean-push-success.png)
 
